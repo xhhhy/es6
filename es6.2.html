@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta>
+    <meta>
+    <meta>
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let p = {}
+        p.a = "a"
+        p["a" + "bc"] = "123"
+        console.log(p)
+        //ES6 允许字面量定义对象时，用方法二（表达式）作为对象的属性名，即把表达式放在方括号内。
+        let propkey = "foo"
+        let obj = {
+            [propkey]: true,
+            ["a" + "bc"]: 123
+        }
+        console.log(obj)
+        let lastWord = "lastword"
+        const a = {
+            "firstword": "hello",
+            [lastWord]: "world"
+        }
+        console.log(a["firstword"])
+        console.log(a["lastword"])
+        console.log(a[lastWord])
+        //表达式还可以用于定义方法名。
+        let obj1 = {
+            ['h' + 'ello']() {
+                return "hi";
+            }
+        }
+        console.log(obj1.hello())
+        //注意，属性名表达式与简洁表示法，不能同时使用，会报错。
+        // const  baz = "ccc" 会报错
+        const foo = 'bar';
+        const baz = { [foo]: 'abc' };
+        //函数的name属性，返回函数名。对象方法也是函数，因此也有name属性。
+        const person = {
+            sayhello() {
+                console.log("hello")
+            }
+        }
+        console.log(person.sayhello.name)
+
+        //如果对象的方法使用了取值函数（getter）和存值函数（setter），则name属性不是在该方法上面，而是该方法的属性的描述对象的get和set属性上面，返回值是方法名前加上get和set。
+        const obj2 = {
+            get foo() { },
+            set foo(x) { }
+        };
+        //console.log(obj2.foo.name)
+        const descriptor = Object.getOwnPropertyDescriptor(obj2, 'foo')
+        console.log(descriptor)
+        //如果对象的方法是一个 Symbol 值，那么name属性返回的是这个 Symbol 值的描述。
+        const key1 = Symbol("descriptor")
+        const key2 = Symbol("123")
+        let obj3 = {
+            [key1]() { },
+            [key2]() { }
+        }
+        console.log(obj3[key1].name)
+        console.log(obj3[key2].name)
+        //对象的每个属性都有一个描述对象（Descriptor），用来控制该属性的行为。Object.getOwnPropertyDescriptor方法可以获取该属性的描述对象。
+        let obj4 = { obj4: 123, name: "123", age: "123", price: "999" }
+        console.log(Object.getOwnPropertyDescriptor(obj4, 'obj4'))
+        for (const key in obj4) {
+            if (obj4.hasOwnProperty(key)) {
+                console.log(key)
+                const element = obj4[key];
+                console.log(element)
+            }
+        }
+        // 我们知道，this关键字总是指向函数所在的当前对象，ES6 又新增了另一个类似的关键字super，指向当前对象的原型对象。
+        const proto = {
+            foo: "hello111"
+        }
+        const objs = {
+            foo: "world",
+            find() {
+                return super.foo
+            }
+        }
+        Object.setPrototypeOf(objs, proto)
+        console.log(objs.find())
+        // 报错
+        // const obj = {
+        //   foo: super.foo
+        // }
+        // 报错
+        // const obj = {
+        //   foo: () => super.foo
+        // }
+        // 报错
+        // const obj = {
+        //   foo: function () {
+        //     return super.foo
+        //   }
+        // }
+        // 上面三种super的用法都会报错，因为对于 JavaScript 引擎来说，这里的super都没有用在对象的方法之中。第一种写法是super用在属性里面，第二种和第三种写法是super用在一个函数里面，然后赋值给foo属性。目前，只有对象方法的简写法可以让 JavaScript 引擎确认，定义的是对象的方法。
+        // JavaScript 引擎内部，super.foo等同于Object.getPrototypeOf(this).foo（属性）或Object.getPrototypeOf(this).foo.call(this)（方法）
+        
+        //对象的扩展运算符 
+        //对象的解构赋值用于从一个对象取值，相当于将目标对象自身的所有可遍历的（enumerable）、但尚未被读取的属性，分配到指定的对象上面。所有的键和它们的值，都会拷贝到新对象上面。
+        let per = {c:1,age:12,brithdy:7889}
+        let pers = [1,12,7889]
+        pers[0]=2
+        const [w,...e] = pers
+        console.log(w+"...")
+        const  {age,...d}=per
+        per.age=13
+        console.log(age)
+        //解构赋值必须是最后一个参数，否则会报错。
+        // 注意，解构赋值的拷贝是浅拷贝，即如果一个键的值是复合类型的值（数组、对象、函数）、那么解构赋值拷贝的是这个值的引用，而不是这个值的副本。
+        let obja = { a: { b: 1 } };
+        let { ...x } = obja;
+        obja.a.b = 2;
+        console.log(x.a.b)  // 2
+        //Object.assign方法用于对象的合并，将源对象（source）的所有可枚举属性，复制到目标对象（target）。
+        //  let a = {a:"123"} ; let b={b:"456"}
+        // Object.assign(a,b)
+        // {a: "123", b: "456"}
+        // let c = {a:"444",c:"777"}
+        // Object.assign(a,b,c)
+        // {a: "444", b: "456", c: "777"}
+        //Object.assign方法实行的是浅拷贝，而不是深拷贝。也就是说，如果源对象某个属性的值是对象，那么目标对象拷贝得到的是这个对象的引用。
+
+
+        //Object.setPrototypeOf方法的作用与__proto__相同，用来设置一个对象的prototype对象，返回参数对象本身。它是 ES6 正式推荐的设置原型对象的方法。
+        let pro = {}
+        let newobj  = {x:10}
+        Object.setPrototypeOf(newobj,pro)
+        pro.y = 20
+        pro.z = 40
+        console.log(newobj)
+        //用于读取一个对象的原型对象。
+       console.log(Object.getPrototypeOf(newobj)) 
+       //如果参数不是对象，会被自动转为对象。
+       console.log(Object.getPrototypeOf('foo')) 
+       console.log(Object.getPrototypeOf(111)) 
+
+        console.log(newobj.__proto__)
+        for(const key in newobj){
+        console.log(newobj[key])
+        }
+        //上面代码将proto对象设为obj对象的原型，所以从obj对象可以读取proto对象的属性。
+        //ES5 引入了Object.keys方法，返回一个数组，成员是参数对象自身的（不含继承的）所有可遍历（enumerable）属性的键名。
+        console.log(Object.keys(newobj))
+
+       // Object.values方法返回一个数组，成员是参数对象自身的（不含继承的）所有可遍历（enumerable）属性的键值。
+       //属性名为数值的属性，是按照数值大小，从小到大遍历的，因此返回的顺序是b、c、a。
+        const newobj1={4:"123",3:'789',7:null,1:undefined,5:false}
+        console.log(Object.values(newobj1))
+
+        //Object.values只返回对象自身的可遍历属性。
+        //Object.create方法的第二个参数添加的对象属性（属性p），如果不显式声明，默认是不可遍历的，因为p的属性描述对象的enumerable默认是false，Object.values不会返回这个属性。只要把enumerable改成true，Object.values就会返回属性p的值。
+        const newobj2 = Object.create({},{p:{value:11,enumerable: true}})
+        console.log(newobj2)
+       console.log(Object.values(newobj2)) 
+        //如果Object.values方法的参数是一个字符串，会返回各个字符组成的一个数组。
+        console.log(Object.values("foo"))
+        //Object.entries()方法返回一个数组，成员是参数对象自身的（不含继承的）所有可遍历（enumerable）属性的键值对数组。
+        //该方法的行为与Object.values基本一致。
+        const nobj1 = { foo: 'bar', baz: 42 };
+        console.log(Object.entries(obj))
+        //自己实现Object.entries方法。
+        // Generator函数的版本
+        function* entries(obj) {
+        for (let key of Object.keys(obj)) {
+            yield [key, obj[key]];
+        }
+        }
+        // 非Generator函数的版本
+        function entries(obj) {
+        let arr = [];
+        for (let key of Object.keys(obj)) {
+            arr.push([key, obj[key]]);
+        }
+        return arr;
+        }
+        //Object.fromEntries()方法是Object.entries()的逆操作，用于将一个键值对数组转为对象。
+        //使用不成功
+        //chrome v71.0.3578.98 未实现
+        //firefox,v64 实现了
+        console.log(Object.fromEntries([['foo', 'bar'],['baz', 42]]))
+        
+
+
+        
+    </script>
+</body>
+
+</html>
+ 
